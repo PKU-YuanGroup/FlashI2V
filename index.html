@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="A image-to-video generation pipeline.">
+  <meta name="keywords" content="Image-to-Video, Conditional Image Leakage, Flow Matching, Latent Shifting, Fourier Transforms">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlashI2V: Fourier-Guided Latent Shifting Prevents Conditional Image Leakage in Image-to-Video Generation</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title"><b>FlashI2V</b>: <b>F</b>ourier-Guided <b>La</b>tent <b>Sh</b>ifting Prevents Conditional Image Leakage in Image-to-Video Generation</h1>
+          <div class="is-size-5 publication-authors">
+            <!-- <div class="author-row">
+              <span class="author-block" style="font-size: 28px;">
+                Anonymous
+              </span>
+            </div> -->
+
+            <div class="author-row">
+              <span class="author-block">
+                <a href="https://github.com/yunyangge">Yunyang Ge</a><sup>1,3</sup>,</span>
+              <span class="author-block">
+                <a href="https://cxh0519.github.io/">Xinhua Cheng</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://github.com/ZChenshy">Chengshu Zhao</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://github.com/pkuhxy">Xianyi He</a><sup>1,3</sup>,</span>
+            </div>
+            <div class="author-row">
+              <span class="author-block">
+                <a href="https://shyuanbest.github.io/">Shenghai Yuan</a><sup>1,3</sup>,</span>
+              <span class="author-block">
+                <a href="https://linb203.github.io/">Bin Lin</a><sup>1,3</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?hl=zh-CN&user=2ageYbMAAAAJ">Bin Zhu</a><sup>1,3</sup>,</span>  
+              <span class="author-block">
+                <a href="https://yuanli2333.github.io/">Li Yuan</a><sup>1,2,†</sup></span>
+            </div>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Peking University,</span>
+            <span class="author-block"><sup>2</sup>Peng Cheng Laboratory,</span>
+            <span class="author-block"><sup>3</sup>Rabbitpre Intelligence</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!-- <span class="link-block">
+                <a href="https://huggingface.co/papers/2411.17440"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2411.17440"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span> -->
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/PKU-YuanGroup/FlashI2V"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- HuggingFace Link. -->
+              <span class="link-block">
+              <a href="https://huggingface.co/yunyangge/FlashI2V-1.3B"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                    <i class="fas fa-robot"></i>
+                </span>
+                <span>Model</span>
+              </a>
+            </span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<style>
+  .image-container img {
+    width: 100%; /* Make image responsive */
+    height: auto; /* Maintain original aspect ratio */
+    object-fit: contain; /* Ensure the entire image is visible without cropping */
+  }
+  .text-cell {
+    width: 140px; /* Allows the text cell to adjust based on content */
+    text-align: center;
+  }
+  .square-image {
+    width: 200px; /* Set both width and height to the same value */
+    height: 230px;
+    object-fit: cover; /* This will make sure the images cover the square area without distorting their aspect ratios */
+  }
+  table {
+    border-collapse: collapse; /* Removes the space between borders */
+  }
+  table, th, td {
+    border: 1.5px solid rgb(230, 230, 230); 
+  }
+  th, td {
+    text-align: center; 
+  }
+</style>
+
+<section >
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            In Image-to-Video (I2V) generation, a video is created using an input image as the first-frame condition.
+            Existing I2V methods concatenate the full information of the conditional image with noisy latents to achieve high fidelity. 
+            However, the denoisers in these methods tend to shortcut the conditional image, which is known as conditional image leakage, leading to performance degradation issues such as slow motion and color inconsistency. 
+            In this work, we further clarify that conditional image leakage leads to <b>overfitting</b> to in-domain data and decreases the performance in out-of-domain scenarios. 
+            Moreover, we introduce <b>F</b>ourier-Guided <b>La</b>tent <b>Sh</b>ifting <b>I2V</b>, named <b>FlashI2V</b>, to prevent conditional image leakage. 
+            Concretely, FlashI2V consists of: (1) <b>Latent Shifting.</b> We modify the source and target distributions of flow matching by subtracting the conditional image information from the noisy latents, thereby incorporating the condition implicitly. 
+            (2) <b>Fourier Guidance.</b> We use high-frequency magnitude features obtained by the Fourier Transform to accelerate convergence and enable the adjustment of detail levels in the generated video. 
+            Experimental results show that our method effectively overcomes conditional image leakage and achieves the best generalization and performance on out-of-domain data among various I2V paradigms. 
+            With only 1.3B parameters, FlashI2V achieves a dynamic degree score of 53.01 on Vbench-I2V, surpassing CogVideoX1.5-5B-I2V and Wan2.1-I2V-14B-480P.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+  </div>
+</section>
+
+
+
+<section class="section" >
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Finding</h2>
+        <img src="https://github.com/user-attachments/assets/a159d190-e044-4b63-b1a3-115ebc10a7dc" alt="framework">
+        <div class="content has-text-justified">
+          <p>
+            Existing I2V Methods involves<b> Conditional image leakage</b>.
+            (a) Conditional image leakage causes performance degradation issues, where the videos are sampled from Wan2.1-I2V-14B-480P with Vbench-I2V text-image pairs.
+            (b) In the existing I2V paradigm, we observe that chunk-wise FVD on in-domain data increases over time, while chunk-wise FVD on out-of-domain data remains consistently high, indicating that the law learned on in-domain data by the existing paradigm fails to generalize to out-of-domain data.
+        </div>
+      </div>
+    </div>
+    <!--/ Method. -->
+</section>
+
+
+
+<section class="section" >
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Model Overview</h2>
+        <img src="https://github.com/user-attachments/assets/4161a4d6-021e-4eed-9667-4890c60019cf" alt="framework">
+        <div class="content has-text-justified">
+          <p>
+            Based on the finding, we propose FlashI2V to introduce conditions implicitly. 
+            We extract features from the conditional image latents using a learnable
+            projection, followed by the latent shifting to obtain a renewed intermediate state that implicitly
+            contains the condition. Simultaneously, the conditional image latents undergo the Fourier Transform
+            to extract high-frequency magnitude features as guidance, which are concatenated with noisy latents
+            and injected into DiT. During inference, we begin with the shifted noise and progressively denoise
+            following the ODE, ultimately decoding the video.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Method. -->
+</section>
+
+<section class="section" >
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Comparison</h2>
+        <img src="https://github.com/user-attachments/assets/7819e170-9721-4680-a406-2aca3b8d6a32" alt="framework">
+
+      </div>
+    </div>
+    <!--/ Method. -->
+</section>
+
+<section class="hero is-light is-small" >
+  <div class="hero-body">
+    <div class="container">
+
+
+      <div id="new-carousel-container" class="carousel-container">
+
+        <!-- cat -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/b5402719-68fb-4b77-8201-5143d8da95c2" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A curious cat peers intently into the lens, its wide eyes shimmering with intrigue. The monochromatic palette accentuates the feline’s delicate whiskers and soft fur ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/3a22332c-f77d-4375-bbcd-c35de078319f" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/4a8bc003-6db5-4905-9881-24c6c7e4b4c6" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/f90f921c-287b-4cf2-9a8a-d67684358ab4" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+      
+
+        <!-- astronauts -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/be1b14ae-b55b-4317-8e22-df5402c43b81" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">Suspended in the vast silence of space, an astronaut drifts weightlessly above the glowing curve of Earth. The planet’s vibrant blues and swirling white clouds stretch beneath, illuminated by the soft ......</p>
+            </div>
+          </div>
+
+          
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/c2af6bd8-6c9a-43f6-9f91-b710427cd5dc" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/7c02e6e8-1388-42b9-9357-deeab6cb509c" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/68eda89b-eeab-4af7-994c-23cf7eeddca6" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+            
+            </div>
+
+          </div>
+        </div>
+
+        <!-- balloon -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/34df8d9c-6d2f-405b-850c-d1792594d08f" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A majestic hot-air balloon drifts gracefully above a sunlit desert, its striped envelope casting a gentle shadow over rugged hills and ancient rock formations. The vast expanse of golden sand stretches ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/b4c878a9-6cc0-4b39-842e-07de29000976" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/730e062c-6cbf-466d-a5e4-c834484381ef" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/2257893d-1878-4741-8ad3-2af48523d894" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+            
+
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- bear -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/f1c39112-8bbe-4747-aae7-748d518db9f9" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A powerful brown bear stands knee-deep in a shimmering river, its wet fur glistening in the sunlight. Clamped firmly in its jaws is a freshly caught fish, still dripping with water and struggling in vain ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/ab190492-af1f-4eae-a4b7-c6af75f290f5" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/e15f7316-d689-41bb-abef-0ee85c547119" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/53adfb10-c336-40fb-8ded-053ac542a181" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- bike -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/efdb0193-9a65-402a-9d03-ca42b8c23b2b" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A skilled rider navigates a rugged dirt bike course, expertly maneuvering over a massive concrete pipe and scattered rocks. Dressed in full protective gear and a vibrant helmet, the rider leans forward ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/2faec85b-984c-4a53-9732-35fbfb71fba0" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/8f45c96d-e8a7-481b-a5e7-0eaf0ee5a5ff" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/82faf9ef-afeb-48f7-abc5-3583e2a75355" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- bus -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/db1b9fdb-34ef-46d4-b194-07e7aad66eb9" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A vibrant red bus glides through a snow-blanketed city street, its headlights cutting through the swirling flakes and illuminating the icy road ahead. Towering buildings loom on either side ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/df7c7db6-f099-4400-8dac-1c5ae20959bb" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/28be73e7-367f-4c5a-847c-ba313cfd2954" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/644f048c-22fc-471d-97c9-5c81f6ceeeb4" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- car -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/4480db0f-68ab-4bb4-8f7a-55d66a2a7883" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A sleek red Alfa Romeo sports car tears down a winding road, its aerodynamic curves gleaming under the sunlight. The polished crimson body reflects the blur of trees and sky as it slices through the landscape with effortless speed ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/82a4c2c4-1e11-497e-8406-a73b024bdbf5" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/efbf12aa-0d43-4916-bf9e-5dbc3d7fa67c" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/6232993f-24af-479b-8f4b-82f5c2257da8" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- train -->
+        <div class="new-layout-item">
+
+          <div class="top-content">
+            <div class="image-container">
+              <img src="https://github.com/user-attachments/assets/ae2ee18d-66de-4f71-84b6-26ba814e0860" alt="Overview Image" class="overview-image">
+            </div>
+            <div class="description-container">
+              <p class="overview-description">A powerful steam locomotive thunders along narrow tracks, its iron body gleaming beneath a canopy of towering evergreens. Billowing clouds of smoke and steam swirl into the forest air ......</p>
+            </div>
+          </div>
+
+
+          <div class="six-videos">
+
+
+            <div class="video-row">
+              
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/a41341e7-e422-4f6b-9026-c75f119fb52c" type="video/mp4">
+                </video>
+                <p class="bottom-text">FlashI2V (1.3B)</p>
+              </div>
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/9fe29559-68f0-43b5-9964-777ae76ace06" type="video/mp4">
+                </video>
+                <p class="bottom-text">Wan2.1-I2V-14B-480P</p>
+              </div>
+
+
+              <div class="video-item">
+                <video autoplay controls muted loop playsinline>
+                  <source src="https://github.com/user-attachments/assets/3c1fe38a-a4c4-47ce-a612-c4470e374541" type="video/mp4">
+                </video>
+                <p class="bottom-text">CogVideoX1.5-5B-I2V</p>
+              </div>
+
+
+
+            </div>
+
+
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="new-pagination-dots" class="pagination-dots"></div>
+      <button class="new-layout-nav prev" onclick="prevNewSlide()">&#10094;</button>
+      <button class="new-layout-nav next" onclick="nextNewSlide()">&#10095;</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" >
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Ablation Study</h2>
+        <img src="https://github.com/user-attachments/assets/07a08665-8b06-41f4-bbb7-e41d82c9371c" alt="framework">
+        <div class="content has-text-justified">
+          <p>
+            Comparing the chunk-wise FVD variation patterns of different I2V
+            paradigms on both the training and validation sets, it is observed that only FlashI2V exhibits the
+            same time-increasing FVD variation pattern in both sets. This suggests that only FlashI2V is capable
+            of applying the generation law learned from in-domain data to out-of-domain data. Additionally,
+            FlashI2V has the lowest out-of-domain FVD, demonstrating its performance advantage.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Method. -->
+</section>
+
+<div class="columns is-centered has-text-centered" style="margin-top: 80px;">
+  <div class="column is-four-fifths">
+    <h2 class="title is-3">Gallery</h2>
+  </div>
+</div>
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="carousel-container" class="carousel-container">
+        
+        
+        <!-- 1-4 7 21 27 35-->
+        <div class="carousel-item">
+
+          <div class="images-row">
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/d8d388aa-e446-4a52-a8d5-b4bbb341971e" alt="Image 1">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/7764a0d8-4eed-4dd9-b419-0271a2cd7c30" alt="Image 2">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/cfa70379-ef9d-4ea4-8c5d-f3d293b809ca" alt="Image 3">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/9c9a04ee-1ca5-480f-9c71-2def516ec176" alt="Image 4">
+            </div>
+          </div>
+
+
+          <div class="videos-grid">
+            <div class="video-item">
+              <video poster="" id="shiba" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/fbf883b0-5e08-44b7-9a31-5bffc6a80125" type="video/mp4">
+              </video>
+              <p>A man dressed in a sharp black suit and an ornate sombrero stands out in a lively outdoor setting. His voice rings out powerfully, capturing the energy and spirit of traditional Mexican celebration ...... </p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="fullbody" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/9faea0ab-c726-44f1-b262-a4daa6d8a512" type="video/mp4">
+              </video>
+              <p>A traveler sits atop a pale horse, guided steadily by a companion who leads the way across a windswept, sandy plain. Dust swirls around their boots as they move forward, framed by distant hills and a misty sky ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="blueshirt" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/1e68967c-61ed-457d-878f-e5310a26722b" type="video/mp4">
+              </video>
+              <p>A graceful woman stands elegantly in a flowing blue sari, her long hair cascading over her shoulder as she gently plays with its strands. Gold bangles adorn her wrist, adding a touch of shimmer to her poised look ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="mask" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/0abeb7b9-401b-4715-b934-986a435d8ba0" type="video/mp4">
+              </video>
+              <p>An open book lies engulfed in vivid flames, its pages curling and blackening as fire consumes the words. Bright orange tongues of fire dance across the paper, casting dramatic shadows and illuminating ......</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5-8 109 142 149 151-->
+        <div class="carousel-item">
+
+          <div class="images-row">
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/94642e10-39ee-41bc-ac0a-d37f99d816d7" alt="Image 1">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/17beb849-0403-4090-aa4f-02c9d85f2e45" alt="Image 2">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/156ffeb3-542d-45f1-89b3-2b9038fc9911" alt="Image 3">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/b6d15a1f-6049-491f-ba7c-aa9bf24710cc" alt="Image 4">
+            </div>
+          </div>
+
+
+          
+
+          <div class="videos-grid">
+            <div class="video-item">
+              <video poster="" id="shiba" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/77f68d35-cbc2-4b3b-b371-6f17f1cfd861" type="video/mp4">
+              </video>
+              <p>Towering flames leap into the darkness, casting a golden glow across the night. Thick logs crackle and pop as the bonfire roars, sending a shower of glowing embers swirling upward into the cool air ...... </p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="fullbody" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/3270ba31-56f3-4cbd-b92e-27e286a5ffb4" type="video/mp4">
+              </video>
+              <p>Dressed in a traditional Mexican charro suit adorned with intricate silver embroidery and a large, elegant bow tie, a musician stands confidently among lush greenery and rustic decor. He holds an acoustic guitar ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="blueshirt" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/2ee57082-1150-4e97-a45b-be4885cc317b" type="video/mp4">
+              </video>
+              <p>A determined cyclist powers his mountain bike up a rugged, rocky hilltop, surrounded by sweeping views and dramatic skies. Wearing a backpack and dressed in athletic gear, he navigates the uneven terrain ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="mask" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/8d77cfb0-d546-43d0-a717-a0dd7f3237cf" type="video/mp4">
+              </video>
+              <p>A man sits on the worn stone steps of a rustic yellow house, strumming an acoustic guitar. Surrounded by overgrown grass and climbing vines, he creates a tranquil scene, his relaxed posture and casual attire ......</p>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 9-12 163 191 273 280 -->
+
+        <div class="carousel-item">
+
+          <div class="images-row">
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/046d9130-ab12-49d3-8903-1bfba0a6b84f" alt="Image 1">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/9cafbac9-fcb3-45f6-aeb6-396141f079fa" alt="Image 2">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/7839ac99-323b-4849-8688-e296d81b7e8d" alt="Image 3">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/9b994bb2-9ffd-4353-9e2e-f5e6895a4ad4" alt="Image 4">
+            </div>
+          </div>
+
+
+          <div class="videos-grid">
+            <div class="video-item">
+              <video poster="" id="shiba" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/518af498-5488-4d3f-8401-13437d741080" type="video/mp4">
+              </video>
+              <p>A rider grips the handlebars of a motorcycle, cruising down a winding, sun-dappled road flanked by lush green trees. The world blurs at the edges, capturing the exhilarating sense of speed and freedom ...... </p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="fullbody" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/5edc7b80-0c04-41b3-bd5c-029191bf9577" type="video/mp4">
+              </video>
+              <p>A rider in vibrant racing gear leans into a sharp turn, expertly maneuvering an ATV across a rugged dirt track. Dust billows dramatically behind the vehicle, capturing the intensity and speed of the moment ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="blueshirt" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/eb74c91e-8b4e-47b0-b4ef-6eaa149fa9ea" type="video/mp4">
+              </video>
+              <p>A woman with flowing, jet-black hair stands with her back slightly turned, exuding an air of quiet confidence. Sunlight softly illuminates her bare shoulder, revealed by a loosely draped beige sweater that slips ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="mask" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/362e73a8-20b3-4f1b-a549-1e420a4ab798" type="video/mp4">
+              </video>
+              <p>A young boy stands in an open field beneath a brilliant blue sky, his dark hair catching the sunlight. Behind him, a group of horses graze peacefully on the grass, their coats glowing in the afternoon light ......</p>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 13-16 172 184 214 352 -->
+
+        <div class="carousel-item">
+
+          <div class="images-row">
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/a0aa3a51-8f05-47bf-a232-106205d77a3e" alt="Image 1">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/ee129c55-9165-49d4-9bae-60de77a66091" alt="Image 2">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/7874feb4-faf0-456b-bbd9-4256fe2bc01d" alt="Image 3">
+            </div>
+            <div class="image-item">
+              <img src="https://github.com/user-attachments/assets/314eea44-726c-4d3a-a91d-cc56113f26ff" alt="Image 4">
+            </div>
+          </div>
+
+
+          <div class="videos-grid">
+            <div class="video-item">
+              <video poster="" id="shiba" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/0f89c8b5-c62c-440f-ac9d-78a983a00a3e" type="video/mp4">
+              </video>
+              <p>A charming penguin waddles confidently along the shoreline, its sleek black-and-white plumage standing out against the dark, pebbled sand. Gentle waves lap at the beach just behind, creating a dynamic ...... </p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="fullbody" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/b2a020b6-f3bf-4a0f-83f7-d0194366b358" type="video/mp4">
+              </video>
+              <p>Steam rises as hot water is carefully poured from a rustic kettle over fresh coffee grounds, blooming in a paper filter atop a glass pot. The rich aroma of brewing coffee mingles with the crisp outdoor air ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="blueshirt" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/418a8fa3-1f7b-4a5a-868c-70dd3dc153a8" type="video/mp4">
+              </video>
+              <p>A graceful sea turtle glides effortlessly through crystal-clear turquoise waters, its patterned shell catching the sunlight that filters down from above. With powerful, paddle-like flippers, it moves serenely ......</p>
+            </div>
+            <div class="video-item">
+              <video poster="" id="mask" autoplay controls muted loop playsinline>
+                <source src="https://github.com/user-attachments/assets/60848deb-6d22-4fba-ac9e-b168ddc2e875" type="video/mp4">
+              </video>
+              <p>Two women share a lively meal at a cozy restaurant, savoring slices of fresh pizza. The table is set with elegant wine glasses and plates, creating an inviting atmosphere for conversation and laughter ......</p>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <div id="pagination-dots" class="pagination-dots"></div>
+      <button class="layout-nav prev" onclick="prevSlide()">&#10094;</button>
+      <button class="layout-nav next" onclick="nextSlide()">&#10095;</button>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const items = document.querySelectorAll('.carousel-item');
+    const paginationDotsContainer = document.getElementById('pagination-dots');
+
+
+    items.forEach((_, index) => {
+        const dot = document.createElement('span');
+        dot.classList.add('dot');
+        if (index === 0) {
+            dot.classList.add('active'); 
+        }
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            showSlide(currentSlide);
+        });
+        paginationDotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('#pagination-dots .dot');
+
+    let currentSlide = 0;
+
+    function showSlide(index) {
+
+        if (index >= items.length) {
+            currentSlide = 0; 
+        } else if (index < 0) {
+            currentSlide = items.length - 1;  
+        } else {
+            currentSlide = index;
+        }
+
+
+        items.forEach((item, i) => {
+            item.classList.remove('active');
+            if (i === currentSlide) {
+                item.classList.add('active');
+            }
+        });
+
+
+        dots.forEach((dot, i) => {
+            dot.classList.remove('active');
+            if (i === currentSlide) {
+                dot.classList.add('active');
+            }
+        });
+    }
+
+    function nextSlide() {
+        showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+        showSlide(currentSlide - 1);
+    }
+
+
+    document.querySelector('.layout-nav.prev').addEventListener('click', prevSlide);
+    document.querySelector('.layout-nav.next').addEventListener('click', nextSlide);
+
+
+    showSlide(currentSlide);
+
+
+    const newItems = document.querySelectorAll('.new-layout-item');
+    const newPaginationDotsContainer = document.getElementById('new-pagination-dots');
+
+
+    newItems.forEach((_, index) => {
+        const newDot = document.createElement('span');
+        newDot.classList.add('new-dot');
+        if (index === 0) {
+            newDot.classList.add('active'); 
+        }
+        newDot.addEventListener('click', () => {
+            currentNewSlide = index;
+            showNewSlide(currentNewSlide);
+        });
+        newPaginationDotsContainer.appendChild(newDot);
+    });
+
+    const newDots = document.querySelectorAll('#new-pagination-dots .new-dot');
+
+    let currentNewSlide = 0;
+
+    function showNewSlide(index) {
+
+        if (index >= newItems.length) {
+            currentNewSlide = 0;  
+        } else if (index < 0) {
+            currentNewSlide = newItems.length - 1; 
+        } else {
+            currentNewSlide = index;
+        }
+
+
+        newItems.forEach((item, i) => {
+            item.classList.remove('active');
+            if (i === currentNewSlide) {
+                item.classList.add('active');
+            }
+        });
+
+
+        newDots.forEach((newDot, i) => {
+            newDot.classList.remove('active');
+            if (i === currentNewSlide) {
+                newDot.classList.add('active');
+            }
+        });
+    }
+
+    function nextNewSlide() {
+        showNewSlide(currentNewSlide + 1);
+    }
+
+    function prevNewSlide() {
+        showNewSlide(currentNewSlide - 1);
+    }
+
+
+    document.querySelector('.new-layout-nav.prev').addEventListener('click', prevNewSlide);
+    document.querySelector('.new-layout-nav.next').addEventListener('click', nextNewSlide);
+
+
+    showNewSlide(currentNewSlide);
+});
+
+</script>
+
+
+
+</body>
+</html>
