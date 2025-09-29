@@ -1,0 +1,92 @@
+{
+    "pipeline_class": "FlashI2VPipeline",
+    "prompt": "examples/wan2.1/test_i2v/prompt.txt",
+    "image": "examples/wan2.1/test_i2v/image.txt",
+    "save_path": "test_samples/test_flashi2v",
+    "use_prompt_preprocess": false,
+    "dtype": "bf16",
+    "device": "npu",
+    "frame_interval": 1,
+    "fps": 16,
+    "pipeline_config": {
+        "input_size": [49, 480, 832],
+        "return_inner_latents": false,
+        "return_inner_latents_steps": 10,
+        "add_noise_to_start_frame": false
+    },
+    "data_transform": {
+        "video":[
+            {
+                "trans_type": "CenterCropResizeVideo",
+                "param": {
+                    "transform_size": [480, 832],
+                    "align_corners": false,
+                    "antialias": true
+                }
+            },
+            {
+                "trans_type": "ToTensorVideo"
+            },
+            {
+                "trans_type": "norm_fun",
+                "param": {
+                    "mean": 0.5,
+                    "std": 0.5
+                }
+            }
+        ]
+    },
+    "ae": {
+        "model_id": "wan_video_vae",
+        "from_pretrained": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/vae",
+        "dtype": "float32",
+        "do_sample": false,
+        "enable_tiling": false,
+        "norm_latents": true,
+        "norm_mode": "channel_specified_shift_scale"
+    },
+    "tokenizer":{
+        "autotokenizer_name": "AutoTokenizer",
+        "hub_backend": "hf",
+        "from_pretrained": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/tokenizer"
+    },
+    "text_encoder": {
+        "model_id": "UMT5",
+        "hub_backend": "hf",
+        "from_pretrained": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/text_encoder",
+        "dtype": "bf16"
+    },
+    "predictor": {
+        "model_id": "flashi2vdit",
+        "dtype": "bf16",
+        "fft_return_abs": true,
+        "conv3x3x3_proj": true,
+        "low_freq_proj": false,
+        "low_freq_energy_ratio": 0.1,
+        "patch_size": [1, 2, 2],
+        "text_len": 512,
+        "in_dim": 16,
+        "hidden_size": 1536,
+        "ffn_dim": 8960,
+        "freq_dim": 256,
+        "text_dim": 4096,
+        "img_dim": 1280,
+        "out_dim": 16,
+        "num_heads": 12,
+        "num_layers": 30,
+        "qk_norm": true,
+        "qk_norm_type": "rmsnorm",
+        "cross_attn_norm": true,
+        "eps": 1e-6,
+        "max_seq_len": 1024,
+        "use_fused_rmsnorm": true,
+        "from_pretrained": "/work/share/projects/gyy/resi2v/FlashI2V/release_weights/flashi2v_1_3B.pt"
+    },
+    "diffusion": {
+        "model_id": "flow_matching",
+        "num_inference_steps": 50,
+        "shift": 7.0,
+        "guidance_scale": 5.0
+    }
+}
+ 

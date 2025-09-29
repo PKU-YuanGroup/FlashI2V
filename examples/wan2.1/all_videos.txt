@@ -1,0 +1,10 @@
+/work,/work/share1/caption/osp/all_videos/random_video_final_1_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_2_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_3_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_4_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_5_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_6_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_7_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_8_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_9_5980186.json
+/work,/work/share1/caption/osp/all_videos/random_video_final_10_5980191.json

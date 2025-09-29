@@ -1,0 +1,31 @@
+{
+    "profile": {
+        "enable": false,
+        "profile_type": "static",
+        "ranks": [0],
+        "static_param": {
+            "level": "level1",
+            "with_stack": true,
+            "with_memory": true,
+            "record_shapes": true,
+            "with_cpu": true,
+            "save_path": "./npu_profiling",
+            "start_step": 5,
+            "end_step": 6,
+            "data_simplification": false,
+            "aic_metrics_type": "PipeUtilization"
+        },
+        "dynamic_param": {
+            "config_path": "path to dynamic config folder"
+        }
+    },
+    "memory_profile": {
+        "enable": false,
+        "start_step": 6,
+        "end_step": 7,
+        "save_path": "./memory_snapshot",
+        "dump_ranks": [0],
+        "stacks": "all",
+        "max_entries": null
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "dataset_param": {
+        "dataset_type": "flashi2v",
+        "metafile_or_dir_path": "/work/share1/caption/osp/lmdb/resi2v_2m/filtered_samples_1858822.lmdb",
+        "text_tokenizer_path": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/tokenizer/",
+        "sample_height": 480,
+        "sample_width": 832,
+        "sample_num_frames": 49,
+        "train_fps": 16,
+        "text_drop_ratio": 0.1,
+        "tokenizer_max_length": 512,
+        "return_prompt_mask": true,
+        "transform_pipeline": {
+            "video":[
+                {
+                    "trans_type": "CenterCropResizeVideo",
+                    "param": {
+                        "transform_size": [480, 832],
+                        "align_corners": false,
+                        "antialias": true
+                    }
+                },
+                {
+                    "trans_type": "ToTensorVideo"
+                },
+                {
+                    "trans_type": "norm_fun",
+                    "param": {
+                        "mean": 0.5,
+                        "std": 0.5
+                    }
+                }
+            ]
+        }
+    },
+    "dataloader_param":{
+        "dataloader_mode": "sampler",
+        "sampler_type": "StatefulDistributedSampler",
+        "collate_param": {
+            "model_name": "flashi2v"
+        },
+        "shuffle": true,
+        "drop_last": true,
+        "pin_memory": true,
+        "num_workers": 16
+    }
+}

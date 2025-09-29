@@ -1,0 +1,60 @@
+{
+    "load_video_features": false,
+    "load_text_features": false,
+    "task": "t2v",
+    "patch": {
+        "ae_float32": "ae_float32"
+    },
+    "ae": {
+        "model_id": "wan_video_vae",
+        "from_pretrained": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/vae/",
+        "dtype": "fp32",
+        "enable_tiling": false,
+        "tiling_param": {
+            "tile_size": [34, 34],
+            "tile_stride": [18, 16]
+        },
+        "norm_latents": true,
+        "norm_mode": "channel_specified_shift_scale",
+        "do_sample": true
+    },
+    "text_encoder": {
+        "model_id": "UMT5",
+        "dtype": "bf16",
+        "hub_backend": "hf",
+        "from_pretrained": "/work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/text_encoder",
+        "use_attention_mask": false
+    },
+    "diffusion": {
+        "model_id": "flow_matching",
+        "use_dynamic_shifting": true,
+        "use_logitnorm_time_sampling": true,
+        "i2v_type": "image2delta"
+    },
+    "predictor": {
+        "model_id": "flashi2vdit",
+        "low_freq_energy_ratio": [0.05, 0.95],
+        "fft_return_abs": true,
+        "dtype": "bf16",
+        "patch_size": [1, 2, 2],
+        "text_len": 512,
+        "in_dim": 16,
+        "hidden_size": 1536,
+        "ffn_dim": 8960,
+        "freq_dim": 256,
+        "text_dim": 4096,
+        "img_dim": 1280,
+        "out_dim": 16,
+        "num_heads": 12,
+        "num_layers": 30,
+        "pipeline_num_layers": [7,8,8,7],
+        "qk_norm": true,
+        "qk_norm_type": "rmsnorm",
+        "cross_attn_norm": true,
+        "eps": 1e-6,
+        "max_seq_len": 1024,
+        "attention_async_offload": false,
+        "use_fused_rmsnorm": true, 
+        "from_pretrained": "/work/share/projects/gyy/resi2v/ResI2V_MM/test_ckpt/wan1.3b/release/mp_rank_00/model_optim_rng.pt"
+    }
+}
