@@ -25,11 +25,10 @@ GRAD_ACC_STEP=1
 DP=$(($WORLD_SIZE/$TP/$PP/$CP))
 GBS=$(($MBS*$GRAD_ACC_STEP*$DP))
 
-MM_DATA="examples/wan2.1/1.3b/flashi2v/data.json"
-MM_MODEL="examples/wan2.1/1.3b/flashi2v/pretrain_model_flashi2v.json"
+MM_DATA="examples/flashi2v/1.3b/data.json"
+MM_MODEL="examples/flashi2v/1.3b/pretrain_model_flashi2v.json"
 MM_TOOL="./mindspeed_mm/tools/tools.json"
-SAVE_PATH="./none"
-layerzero_config="examples/wan2.1/zero_config.yaml"
+SAVE_PATH="./save"
 PROJECT_NAME="test_new_mm_script"
 PROJECT_EXP_NAME="test_new_mm_script"
 PROJECT_DIR=$SAVE_PATH

@@ -1,3 +1,0 @@
-examples/wan2.1/test_i2v/0001.jpg
-examples/wan2.1/test_i2v/0002.jpg
-examples/wan2.1/test_i2v/0003.jpg

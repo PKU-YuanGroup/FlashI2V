@@ -1,7 +1,7 @@
 {
     "pipeline_class": "FlashI2VPipeline",
-    "prompt": "examples/wan2.1/test_i2v/prompt.txt",
-    "image": "examples/wan2.1/test_i2v/image.txt",
+    "prompt": "examples/flashi2v/test_i2v/prompt.txt",
+    "image": "examples/flashi2v/test_i2v/image.txt",
     "save_path": "test_samples/test_flashi2v",
     "use_prompt_preprocess": false,
     "dtype": "bf16",
@@ -80,7 +80,7 @@
         "eps": 1e-6,
         "max_seq_len": 1024,
         "use_fused_rmsnorm": true,
-        "from_pretrained": "/work/share/projects/gyy/resi2v/FlashI2V/release_weights/flashi2v_1_3B.pt"
+        "from_pretrained": "release_weights/npu/flashi2v_1_3B.pt"
     },
     "diffusion": {
         "model_id": "flow_matching",

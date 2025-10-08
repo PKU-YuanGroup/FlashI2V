@@ -1,1 +1,0 @@
-python examples/wan2.1/convert_ckpt.py --source_path /work/share1/checkpoint/pretrained/models/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/transformer --target_path /work/share/projects/gyy/resi2v/MindSpeed-MM/test_ckpt/wan1.3b --mode convert_to_mm

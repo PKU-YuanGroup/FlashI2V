@@ -21,7 +21,7 @@ CP=1
 MBS=1
 GBS=$(($WORLD_SIZE*$MBS/$CP/$TP))
 
-MM_MODEL="examples/wan2.1/1.3b/flashi2v/inference_model.json"
+MM_MODEL="examples/flashi2v/1.3b/inference_model.json"
 
 DISTRIBUTED_ARGS="
     --nproc_per_node $NPUS_PER_NODE \

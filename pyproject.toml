@@ -1,0 +1,50 @@
+[project]
+name = "flashi2v"
+version = "0.1.0"
+description = "FlashI2V: Fourier-Guided Latent Shifting Prevents Conditional Image Leakage in Image-to-Video Generation"
+authors = [
+    {name = "yunyangge", email = "gyy23233@163.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+
+dependencies = [
+    "accelerate==0.32.1",
+    "diffusers==0.33.1",
+    "timm==1.0.8",
+    "torch==2.1.0",
+    "torch_npu==2.1.0.post8",
+    "torchvision==0.16.0",
+    "transformers==4.45.0",
+    "numpy==1.23.5",
+    "opencv-python",
+    "zstandard",
+    "av",
+    "beautifulsoup4",
+    "botocore",
+    "einops",
+    "ftfy",
+    "imageio",
+    "imageio-ffmpeg",
+    "lmdb",
+    "pandas",
+    "Pillow",
+    "pyarrow",
+    "pyyaml",
+    "safetensors",
+    "sentencepiece",
+    "six",
+    "tqdm"
+]
+
+[tool.setuptools]
+packages = ["mindspeed_mm", "megatron"]
+
+[tool.setuptools.package-data]
+"mindspeed_mm" = ["**/*.py"]
+"megatron" = ["**/*.py"]
+
+
+[build-system]
+requires = ["setuptools >= 65.0"]
+build-backend = "setuptools.build_meta"
