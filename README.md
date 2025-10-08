@@ -1,6 +1,8 @@
 # FlashI2V: Fourier-Guided Latent Shifting Prevents Conditional Image Leakage in Image-to-Video Generation
 
 [![arXiv](https://img.shields.io/badge/Arxiv-FlashI2V-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2509.25187)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/yunyangge/FlashI2V-1.3B)
+![Page](https://img.shields.io/badge/Page-GitHub-lightgrey?logo=github)
 
 <h5 align="left"> If you like our project, please give us a star ⭐ on GitHub for latest update.  </h2>
 
@@ -77,6 +79,8 @@
 ## 😮 Highlights
 
 
+## 🔒 License
+* See [LICENSE](LICENSE) for details. For Ascend version, you can see [LICENSE](https://github.com/PKU-YuanGroup/FlashI2V/blob/npu/LICENSE) in [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
 ## ✏️ Citation
 If you want to cite our work, please follow:
 ```
