@@ -78,6 +78,46 @@
 
 ## 😮 Highlights
 
+### 😢 Overfitting to In-domain Data Causes Performance Degradation
+
+- Existing I2V Methods involve Conditional image leakage. (a) Conditional image leakage causes performance degradation issues, where the videos are sampled from Wan2.1-I2V-14B-480P with Vbench-I2V text-image pairs. (b) In the existing I2V paradigm, we observe that chunk-wise FVD on in-domain data increases over time, while chunk-wise FVD on out-of-domain data remains consistently high, indicating that the law learned on in-domain data by the existing paradigm fails to generalize to out-of-domain data.
+
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/a159d190-e044-4b63-b1a3-115ebc10a7dc" style="margin-bottom: 0.2;"/>
+<p>
+
+### 😎 Model Overview
+
+- We propose FlashI2V to introduce conditions implicitly. We extract features from the conditional image latents using a learnable projection, followed by the latent shifting to obtain a renewed intermediate state that implicitly contains the condition. 
+Simultaneously, the conditional image latents undergo the Fourier Transform to extract high-frequency magnitude features as guidance, which are concatenated with noisy latents and injected into DiT. During inference, we begin with the shifted noise and progressively denoise following the ODE, ultimately decoding the video.
+
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/4161a4d6-021e-4eed-9667-4890c60019cf" style="margin-bottom: 0.2;"/>
+<p>
+
+### 😊 Best Generalization and Performance across Different I2V Paradigms
+- Comparing the chunk-wise FVD variation patterns of different I2V paradigms on both the training and validation sets, it is observed that only FlashI2V exhibits the same time-increasing FVD variation pattern in both sets.
+This suggests that only FlashI2V is capable of applying the generation law learned from in-domain data to out-of-domain data. Additionally, FlashI2V has the lowest out-of-domain FVD, demonstrating its performance advantage.
+
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/07a08665-8b06-41f4-bbb7-e41d82c9371c" style="margin-bottom: 0.2;"/>
+<p>
+
+### 🚙 Vbench Results
+
+| Model                                | I2V Paradigm                        | Subject Consistency↑ | Background Consistency↑ | Motion Smoothness↑ | Dynamic Degree↑ | Aesthetic Quality↑ | Imaging Quality↑ | I2V Subject Consistency↑ | I2V Background Consistency↑ |
+|--------------------------------------|-------------------------------------|----------------------|-------------------------|--------------------|-----------------|---------------------|-------------------|---------------------------|----------------------------|
+| SVD-XT-1.0 (1.5B)                    | Repeating Concat and Adding Noise   | 95.52                | 96.61                   | 98.09              | 52.36           | 60.15               | 69.80             | 97.52                     | 97.63                      |
+| SVD-XT-1.1 (1.5B)                    | Repeating Concat and Adding Noise   | 95.42                | 96.77                   | 98.12              | 43.17           | 60.23               | 70.23             | 97.51                     | 97.62                      |
+| SEINE-512x512 (1.8B)                 | Inpainting                          | 95.28                | 97.12                   | 97.12              | 27.07           | 64.55               | **71.39**         | 97.15                     | 96.94                      |
+| CogVideoX-5B-I2V                     | Zero-padding Concat and Adding Noise| 94.34                | 96.42                   | 98.40              | 33.17           | 61.87               | 70.01             | 97.19                     | 96.74                      |
+| Wan2.1-I2V-14B-720P                  | Inpainting                          | 94.86                | 97.07                   | 97.90              | 51.38           | **64.75**           | 70.44             | 96.95                     | 96.44                      |
+| CogVideoX1.5-5B-I2V†                 | Zero-padding Concat and Adding Noise| 95.04                | 96.52                   | **98.47**          | 37.48           | **62.68**           | **70.99**         | 97.78                     | 98.73                      |
+| Wan2.1-I2V-14B-480P†                 | Inpainting                          | **95.68**            | **97.44**               | 98.46              | 45.20           | 61.44               | 70.37             | **97.83**                 | **99.08**                  |
+| **FlashI2V† (1.3B)**                 | **FlashI2V**                        | 95.13                | 96.36                   | 98.35              | **53.01**       | 62.34               | 69.41             | 97.67                     | 98.72                      |
+
+† means testing with recaptioned text-image-pairs in Vbench-I2V.
+
 
 ## 🔒 License
 * See [LICENSE](LICENSE) for details. For Ascend version, you can see [LICENSE](https://github.com/PKU-YuanGroup/FlashI2V/blob/npu/LICENSE) in [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
