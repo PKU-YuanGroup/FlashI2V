@@ -34,10 +34,10 @@
 >
 > </p></details>
    
-## 📣 News
+# 📣 News
 * **[2025.09.30]**  We have uploaded the Ascend version of the training and inference code, along with the model weights. For details, please refer to the [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
 
-## 🗓️ TODO
+# 🗓️ TODO
 - [x] Release [paper](https://arxiv.org/abs/2509.25187)
 - [x] Release [NPU(Ascend) version code](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu)
 - [x] Release [page](https://pku-yuangroup.github.io/FlashI2V/)
@@ -45,8 +45,8 @@
 - [ ] Release GPU(Nvidia) version code
 - [ ] Scaling FlashI2V to 14B
 
-## 😍 Gallery
-### Image-to-Video Results of FlashI2V-1.3B
+# 😍 Gallery
+## Image-to-Video Results of FlashI2V-1.3B
 <table border="0" style="width: 100%; text-align: left; margin-top: 20px;">
   <tr>
       <td>
@@ -112,9 +112,9 @@
   </tr>
 </table>
 
-## 😮 Highlights
+# 😮 Highlights
 
-### Overfitting to In-domain Data Causes Performance Degradation
+## Overfitting to In-domain Data Causes Performance Degradation
 
 <p align="center">
     <img src="https://github.com/user-attachments/assets/a159d190-e044-4b63-b1a3-115ebc10a7dc" style="margin-bottom: 0.2;"/>
@@ -122,7 +122,7 @@
 
 - Existing I2V Methods involve Conditional image leakage. (a) Conditional image leakage causes performance degradation issues, where the videos are sampled from Wan2.1-I2V-14B-480P with Vbench-I2V text-image pairs. (b) In the existing I2V paradigm, we observe that chunk-wise FVD on in-domain data increases over time, while chunk-wise FVD on out-of-domain data remains consistently high, indicating that the law learned on in-domain data by the existing paradigm fails to generalize to out-of-domain data.
 
-### Model Overview
+## Model Overview
 
 <p align="center">
     <img src="https://github.com/user-attachments/assets/4161a4d6-021e-4eed-9667-4890c60019cf" style="margin-bottom: 0.2;"/>
@@ -131,7 +131,7 @@
 - We propose FlashI2V to introduce conditions implicitly. We extract features from the conditional image latents using a learnable projection, followed by the latent shifting to obtain a renewed intermediate state that implicitly contains the condition. 
 Simultaneously, the conditional image latents undergo the Fourier Transform to extract high-frequency magnitude features as guidance, which are concatenated with noisy latents and injected into DiT. During inference, we begin with the shifted noise and progressively denoise following the ODE, ultimately decoding the video.
 
-### Best Generalization and Performance across Different I2V Paradigms
+## Best Generalization and Performance across Different I2V Paradigms
 
 <p align="center">
     <img src="https://github.com/user-attachments/assets/07a08665-8b06-41f4-bbb7-e41d82c9371c" style="margin-bottom: 0.2;"/>
@@ -140,7 +140,7 @@ Simultaneously, the conditional image latents undergo the Fourier Transform to e
 - Comparing the chunk-wise FVD variation patterns of different I2V paradigms on both the training and validation sets, it is observed that only FlashI2V exhibits the same time-increasing FVD variation pattern in both sets.
 This suggests that only FlashI2V is capable of applying the generation law learned from in-domain data to out-of-domain data. Additionally, FlashI2V has the lowest out-of-domain FVD, demonstrating its performance advantage.
 
-### Vbench Results
+## Vbench Results
 
 | Model                                | I2V Paradigm                        | Subject Consistency↑ | Background Consistency↑ | Motion Smoothness↑ | Dynamic Degree↑ | Aesthetic Quality↑ | Imaging Quality↑ | I2V Subject Consistency↑ | I2V Background Consistency↑ |
 |--------------------------------------|-------------------------------------|----------------------|-------------------------|--------------------|-----------------|---------------------|-------------------|---------------------------|----------------------------|
@@ -156,23 +156,23 @@ This suggests that only FlashI2V is capable of applying the generation law learn
 † means testing with recaptioned text-image-pairs in Vbench-I2V.
 
 
-## 🔒 License
+# 🔒 License
 * See [LICENSE](LICENSE) for details. For Ascend version, you can see [LICENSE](https://github.com/PKU-YuanGroup/FlashI2V/blob/npu/LICENSE) in [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
 
-## 🤝 Contributors
+# 🤝 Contributors
 
 <a href="https://github.com/PKU-YuanGroup/FlashI2V/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=PKU-YuanGroup/FlashI2V" />
 </a>
 
 
-## 🙏 Acknowledgements
+# 🙏 Acknowledgements
 - Wan2.1 - https://github.com/Wan-Video/Wan2.1
 - Open-Sora Plan - https://github.com/PKU-YuanGroup/Open-Sora-Plan
 - Mindspeed-MM - https://gitee.com/ascend/MindSpeed-MM
 - Megatron-LM - https://github.com/NVIDIA/Megatron-LM
 
-## ✏️ Citation
+# ✏️ Citation
 If you want to cite our work, please follow:
 ```
 @misc{ge2025flashi2v,
