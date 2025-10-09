@@ -28,8 +28,7 @@
     "diffusion": {
         "model_id": "flow_matching",
         "use_dynamic_shifting": true,
-        "use_logitnorm_time_sampling": true,
-        "i2v_type": "image2delta"
+        "use_logitnorm_time_sampling": true
     },
     "predictor": {
         "model_id": "flashi2vdit",
@@ -55,6 +54,6 @@
         "max_seq_len": 1024,
         "attention_async_offload": false,
         "use_fused_rmsnorm": true, 
-        "from_pretrained": "/work/share/projects/gyy/resi2v/ResI2V_MM/test_ckpt/wan1.3b/release/mp_rank_00/model_optim_rng.pt"
+        "from_pretrained": "release_weights/npu/flashi2v_1_3B.pt"
     }
 }

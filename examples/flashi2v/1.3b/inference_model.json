@@ -9,10 +9,7 @@
     "frame_interval": 1,
     "fps": 16,
     "pipeline_config": {
-        "input_size": [49, 480, 832],
-        "return_inner_latents": false,
-        "return_inner_latents_steps": 10,
-        "add_noise_to_start_frame": false
+        "input_size": [49, 480, 832]
     },
     "data_transform": {
         "video":[
