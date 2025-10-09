@@ -17,7 +17,7 @@
 
 </h5>
 
-<details open><summary>💡 We also have other video generation projects that may interest you ✨. </summary><p>
+<details open><summary>💡 We also have other generation projects that may interest you ✨. </summary><p>
 <!--  may -->
 
 > [**Open-Sora Plan: Open-Source Large Video Generation Model**](https://arxiv.org/abs/2412.00131) <br>
