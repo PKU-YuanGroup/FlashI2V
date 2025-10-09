@@ -2,7 +2,7 @@
 
 [![arXiv](https://img.shields.io/badge/Arxiv-FlashI2V-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2509.25187)
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/yunyangge/FlashI2V-1.3B)
-![Page](https://img.shields.io/badge/Page-GitHub-lightgrey?logo=github)
+[![Page](https://img.shields.io/badge/Page-GitHub-lightgrey?logo=github)](https://pku-yuangroup.github.io/FlashI2V/)
 
 <h5 align="left"> If you like our project, please give us a star ⭐ on GitHub for latest update.  </h2>
 
