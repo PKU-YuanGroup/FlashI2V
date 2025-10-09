@@ -138,7 +138,7 @@ Make sure the inference_model.json file is properly configured.
         "eps": 1e-6,
         "max_seq_len": 1024,
         "use_fused_rmsnorm": true,
-        "from_pretrained": "release_weights/npu/flashi2v_1_3B.pt" # pretrained weights
+        "from_pretrained": "release_weights/npu/flashi2v_1_3B.pt" # Pretrained weights
     },
     "diffusion": {
         "model_id": "flow_matching",
