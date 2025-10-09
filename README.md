@@ -26,7 +26,7 @@
 >
 > [**UniWorld-V1: High-Resolution Semantic Encoders for Unified Visual Understanding and Generation**](https://arxiv.org/abs/2506.03147) <br>
 > Bin Lin, Zongjian Li, Xinhua Cheng etc. <br>
-> [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/UniWorld-V1)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/ConsisID.svg?style=social)](https://github.com/PKU-YuanGroup/UniWorld-V1) [![arXiv](https://img.shields.io/badge/Arxiv-2506.03147-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2506.03147) <br>
+> [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/UniWorld-V1)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/UniWorld-V1.svg?style=social)](https://github.com/PKU-YuanGroup/UniWorld-V1) [![arXiv](https://img.shields.io/badge/Arxiv-2506.03147-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2506.03147) <br>
 >
 > [**Identity-Preserving Text-to-Video Generation by Frequency Decomposition**](https://arxiv.org/abs/2411.17440) <br>
 > Shenghai Yuan, Jinfa Huang, Xianyi He etc. <br>
