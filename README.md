@@ -1,13 +1,49 @@
-# FlashI2V: Fourier-Guided Latent Shifting Prevents Conditional Image Leakage in Image-to-Video Generation
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/a4284be4-c444-4d13-b8f9-d66e52655106" width="200"/>
+<p>
+<h2 align="center"> 
+  <a href="https://arxiv.org/abs/2509.25187">
+    FlashI2V: Fourier-Guided Latent Shifting Prevents Conditional Image Leakage in Image-to-Video Generation
+  </a>
+</h2>
+
+<h5 align="center"> If you like our project, please give us a star ⭐ on GitHub for latest update.  </h2>
+
+<h5 align="center">
 
 [![arXiv](https://img.shields.io/badge/Arxiv-FlashI2V-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2509.25187)
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow)](https://huggingface.co/yunyangge/FlashI2V-1.3B)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-yellow)](https://huggingface.co/yunyangge/FlashI2V-1.3B)
 [![Page](https://img.shields.io/badge/Page-GitHub-lightgrey?logo=github)](https://pku-yuangroup.github.io/FlashI2V/)
 
-<h5 align="left"> If you like our project, please give us a star ⭐ on GitHub for latest update.  </h2>
+</h5>
 
+<details open><summary>💡 We also have other video generation projects that may interest you ✨. </summary><p>
+<!--  may -->
+
+> [**Open-Sora Plan: Open-Source Large Video Generation Model**](https://arxiv.org/abs/2412.00131) <br>
+> Bin Lin, Yunyang Ge and Xinhua Cheng etc. <br>
+[![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/Open-Sora-Plan)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/Open-Sora-Plan.svg?style=social)](https://github.com/PKU-YuanGroup/Open-Sora-Plan) [![arXiv](https://img.shields.io/badge/Arxiv-2412.00131-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2412.00131) <br>
+>
+> [**UniWorld-V1: High-Resolution Semantic Encoders for Unified Visual Understanding and Generation**](https://arxiv.org/abs/2506.03147) <br>
+> Bin Lin, Zongjian Li, Xinhua Cheng etc. <br>
+> [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/UniWorld-V1)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/ConsisID.svg?style=social)](https://github.com/PKU-YuanGroup/UniWorld-V1) [![arXiv](https://img.shields.io/badge/Arxiv-2506.03147-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2506.03147) <br>
+>
+> [**Identity-Preserving Text-to-Video Generation by Frequency Decomposition**](https://arxiv.org/abs/2411.17440) <br>
+> Shenghai Yuan, Jinfa Huang, Xianyi He etc. <br>
+> [![github](https://img.shields.io/badge/-Github-black?logo=github)](https://github.com/PKU-YuanGroup/ConsisID)  [![github](https://img.shields.io/github/stars/PKU-YuanGroup/ConsisID.svg?style=social)](https://github.com/PKU-YuanGroup/ConsisID) [![arXiv](https://img.shields.io/badge/Arxiv-2411.17440-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2411.17440) <br>
+>
+> </p></details>
+   
 ## 📣 News
 * **[2025.09.30]**  We have uploaded the Ascend version of the training and inference code, along with the model weights. For details, please refer to the [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
+
+## 🗓️ TODO
+- [x] Release [paper](https://arxiv.org/abs/2509.25187)
+- [x] Release [NPU(Ascend) version code](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu)
+- [x] Release [page](https://pku-yuangroup.github.io/FlashI2V/)
+- [x] Release [1.3B model](https://huggingface.co/yunyangge/FlashI2V-1.3B)
+- [ ] Release GPU(Nvidia) version code
+- [ ] Scaling FlashI2V to 14B
 
 ## 😍 Gallery
 ### Image-to-Video Results of FlashI2V-1.3B
@@ -122,6 +158,20 @@ This suggests that only FlashI2V is capable of applying the generation law learn
 
 ## 🔒 License
 * See [LICENSE](LICENSE) for details. For Ascend version, you can see [LICENSE](https://github.com/PKU-YuanGroup/FlashI2V/blob/npu/LICENSE) in [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
+
+## 🤝 Contributors
+
+<a href="https://github.com/PKU-YuanGroup/FlashI2V/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=PKU-YuanGroup/FlashI2V" />
+</a>
+
+
+## 🙏 Acknowledgements
+- Wan2.1 - https://github.com/Wan-Video/Wan2.1
+- Open-Sora Plan - https://github.com/PKU-YuanGroup/Open-Sora-Plan
+- Mindspeed-MM - https://gitee.com/ascend/MindSpeed-MM
+- Megatron-LM - https://github.com/NVIDIA/Megatron-LM
+
 ## ✏️ Citation
 If you want to cite our work, please follow:
 ```
