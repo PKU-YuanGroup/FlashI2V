@@ -7,7 +7,7 @@
   </a>
 </h2>
 
-<h5 align="center"> If you like our project, please give us a star ⭐ on GitHub for latest update.  </h2>
+<h5 align="center"> If you like our project, please give us a star ⭐ on GitHub for the latest update.  </h2>
 
 <h5 align="center">
 
@@ -35,16 +35,137 @@
 > </p></details>
    
 # 📣 News
+* **[2025.11.12]**  We have uploaded the FSDP2 + DeepSpeed-Ulysses CP code version, which supports both GPU (Nvidia) and NPU (Ascend) for training and inference, and is compatible with models up to 14B parameters.
 * **[2025.09.30]**  We have uploaded the Ascend version of the training and inference code, along with the model weights. For details, please refer to the [NPU](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) branch.
 
 # 🗓️ TODO
 - [x] Release [paper](https://arxiv.org/abs/2509.25187)
-- [x] Release [NPU(Ascend) version code](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu)
+- [x] Release [NPU(Ascend) version code](https://github.com/PKU-YuanGroup/FlashI2V/tree/npu) with [mindspeed-mm](https://gitee.com/ascend/MindSpeed-MM)
 - [x] Release [page](https://pku-yuangroup.github.io/FlashI2V/)
 - [x] Release [1.3B model](https://huggingface.co/yunyangge/FlashI2V-1.3B)
-- [ ] Release GPU(Nvidia) version code
+- [x] Release FSDP2 + DeepSpeed-Ulysses CP code version, which supports both GPU (Nvidia) and NPU (Ascend).
 - [ ] Scaling FlashI2V to 14B
 
+# 💡Usage
+## ⚙️ Runtime Environment
+### GPU (Nvidia)
+(1) Clone FlashI2V repo.
+
+```
+git clone https://github.com/PKU-YuanGroup/FlashI2V
+```
+
+(2) Prepare the environment
+
+```
+conda create -n flashi2v python=3.10
+conda activate flashi2v
+```
+(3) Install dependencies
+```
+pip install -r requirements.txt
+```
+(4) Install flash attn
+```
+pip install flash-attn --no-build-isolation
+```
+(5) build
+```
+pip install -e .
+```
+### NPU (Ascend)
+⚠️ For proper execution of our code, please install CANN version 8.3.rc1 or later, and follow the [tutorial linked](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/83RC1alpha001/softwareinst/instg/instg_0008.html?Mode=PmIns&OS=Debian&Software=cannToolKit) for detailed installation steps.
+(1) Clone FlashI2V repo.
+
+```
+git clone https://github.com/PKU-YuanGroup/FlashI2V
+```
+
+(2) Prepare the environment
+
+```
+conda create -n flashi2v python=3.10
+conda activate flashi2v
+```
+(3) Install dependencies
+```
+pip install -r requirements.txt
+```
+(4) Install decord
+```
+git clone --recursive https://github.com/dmlc/decord
+mkdir build && cd build 
+cmake .. -DUSE_CUDA=0 -DCMAKE_BUILD_TYPE=Release -DFFMPEG_DIR=/usr/local/ffmpeg 
+make 
+cd ../python 
+pwd=$PWD 
+echo "PYTHONPATH=$PYTHONPATH:$pwd" >> ~/.bashrc 
+source ~/.bashrc 
+python3 setup.py install --user
+```
+(5) build
+```
+pip install -e .
+```
+## 🍕 Sample Image-to-Video
+```
+bash scripts/infer/*pu/infer_flashi2v_*b.sh
+```
+## 🧑‍🏭 Train Image-to-Video
+
+### 📚 Data preparation
+You should create a meta JSON for all the training videos, which includes the following information:
+
+```
+[
+  {
+    "path": "path/to/a/video", # Video path. This kwarg must be specified.
+    "cap": "This is a caption of a video.", # Video caption. This kwarg must be specified.
+    "resolution": {"height": 1080, "width": 1920}, # Video resolution. This kwarg is optional. When not explicitly specified, it retrieves the height and width of the video.
+    "fps": 24, # Video fps. This kwarg is optional. When not explicitly specified, it retrieves the fps of the video.
+    "num_frames": 49, # Video frame number. This kwarg is optional. When not explicitly specified, it retrieves the frame number of the entire video.
+    "cut": [0, 49] # The position of the current clip within the entire video. This field is optional, designed to accommodate the case where only a segment of a long video is selected for training.
+  },
+  {
+    "path": ...
+    "cap": ...
+  },
+  ...
+]
+```
+
+This meta JSON includes a list that records the various information about the videos used for training. 
+Then, you need to specify the following code to filter your training videos to meet the requirements of different training stages.
+
+```
+python filter_data.py --filter_config filter_config.yaml
+```
+
+The content of `filter_config.yaml` is as follows:
+
+```
+ann_txt_path: 'examples/flashi2v/all_videos.txt' # Annotation txt of video jsons.
+save_path: 'test/lmdb/all_videos_720p' # Save dir of lmdb file.
+sample_height: 480 # Sample height of videos in training.
+sample_width: 832 # Sample width of videos in training.
+sample_num_frames: 49 # Sample frame number of videos in training.
+min_hxw: 921600 # 720x1280: 921600, 480x832: 399360, 576x1024: 589824 # Min height * width of videos in training, for filtering videos with low resolution.
+train_fps: 16 # Sample fps of videos in training.
+max_h_div_w_ratio: 1.2 # Max H / W of videos in training.
+min_h_div_w_ratio: 0.4 # Min H / W of videos in training.
+```
+
+And the content of `ann_txt_path.txt` is as follows:
+
+```
+/work,/work/share1/caption/osp/all_videos/random_video_final_1_5980186.json # Root dir of videos, meta json.
+```
+
+After filtering, we will obtain the metadata saved in LMDB format. Since LMDB allows us to maintain low memory usage when processing large datasets, it effectively avoids memory leak issues caused by the decord library.
+### 🤾 Training
+```
+bash scripts/train/*pu/train_flashi2v_*b.sh
+```
 # 😍 Gallery
 ## Image-to-Video Results of FlashI2V-1.3B
 <table border="0" style="width: 100%; text-align: left; margin-top: 20px;">
