@@ -1,0 +1,19 @@
+export WANDB_MODE="offline"
+
+export TOKENIZERS_PARALLELISM=false
+
+MASTER_ADDR=${MASTER_ADDR:-127.0.0.1}
+MASTER_PORT=${MASTER_PORT:-29501}
+NPRC_PER_NODE=${NPRC_PER_NODE:-8}
+NNODES=${PET_NNODES:-1}
+NODE_RANK=${RANK:-0}
+WORLD_SIZE=$(($NNODES * $NPRC_PER_NODE))
+
+torchrun \
+  --nproc_per_node=${NPRC_PER_NODE} \
+  --nnodes=${NNODES} \
+  --node_rank=${NODE_RANK} \
+  --master_addr=${MASTER_ADDR} \
+  --master_port=${MASTER_PORT} \
+  train/train_flashi2v.py \
+  --config configs/train/gpu/flashi2v_1_3b.yaml

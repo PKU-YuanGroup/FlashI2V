@@ -1,0 +1,1 @@
+./hfd.sh Wan-AI/Wan2.1-T2V-14B --tool aria2c -x 10 --local-dir /work/share1/checkpoint/Wan-AI/Wan2.1-T2V-14B
