@@ -244,7 +244,10 @@ class Checkpointer:
             f"{self.save_root_dir}/{PREFIX}{self.last_training_iteration:09d}/{RNG_CHECKPOINT_DIR}"
         )
         print(f'resume rng_state_dict from {last_rng_checkpoint_dir}')
-        rng_state_dict = load(f"{last_rng_checkpoint_dir}/rank_{torch.distributed.get_rank():06d}.pkl", map_location="cpu")
+        if is_npu_available(): # npu will raise serialization error if we use 'load' func from accelerate
+            rng_state_dict = torch.load(f"{last_rng_checkpoint_dir}/rank_{torch.distributed.get_rank():06d}.pkl", weights_only=False, map_location="cpu")
+        else:
+            rng_state_dict = load(f"{last_rng_checkpoint_dir}/rank_{torch.distributed.get_rank():06d}.pkl", map_location="cpu")
         random.setstate(rng_state_dict["random_state"])
         np.random.set_state(rng_state_dict["numpy_random_seed"])
         torch.set_rng_state(rng_state_dict["torch_manual_seed"])
