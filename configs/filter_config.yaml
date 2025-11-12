@@ -1,0 +1,9 @@
+ann_txt_path: 'all_videos.txt'
+save_path: 'lmdb/all_videos_720p'
+sample_height: 480
+sample_width: 832
+sample_num_frames: 49
+min_hxw: 921600 # 720x1280: 921600, 480x832: 399360, 576x1024: 589824
+train_fps: 16
+max_h_div_w_ratio: 1.2
+min_h_div_w_ratio: 0.4
