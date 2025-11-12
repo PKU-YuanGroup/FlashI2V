@@ -138,7 +138,7 @@ This meta JSON includes a list that records the various information about the vi
 Then, you need to specify the following code to filter your training videos to meet the requirements of different training stages.
 
 ```
-python filter_data.py --filter_config filter_config.yaml
+bash scripts/filter_data.sh
 ```
 
 The content of `filter_config.yaml` is as follows:
