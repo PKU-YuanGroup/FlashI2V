@@ -63,9 +63,11 @@ def get_seed_worker(
     def seed_worker(worker_id):
         if device_specific:
             worker_seed = seed + rank * num_workers + worker_id # make sure all workers have different seed
+        else:
+            worker_seed = seed
         # print(f"rank = {rank}, worker_seed = {worker_seed}")
         np.random.seed(worker_seed)
-        os.environ["PYTHONHASHSEED"] = str(seed)
+        os.environ["PYTHONHASHSEED"] = str(worker_seed)
         torch.manual_seed(worker_seed)
         random.seed(worker_seed)
 

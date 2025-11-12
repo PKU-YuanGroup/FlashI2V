@@ -1,5 +1,6 @@
 import torch
 import logging
+from accelerate.utils import is_npu_available as accelerate_is_npu_available
 
 def str_to_precision(s):
     if s == "bfloat16" or s == "bf16":
@@ -51,12 +52,7 @@ def get_memory_allocated():
     return f"{torch.cuda.memory_allocated() / 1024**3:.2f}"  # GiB
 
 def is_npu_available():
-    is_available = True
-    try:
-        import torch_npu
-    except:
-        is_available = False
-    return is_available
+    return accelerate_is_npu_available(True)
 
 def check_and_import_npu():
     if is_npu_available():

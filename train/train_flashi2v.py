@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader
 from flashi2v.data import ultra_datasets, ultra_samplers, ultra_collators
 from flashi2v.data.utils.utils import cyclic_iter
 from flashi2v.utils.log_utils import get_logger, log_on_main_process, verify_min_gpu_count
-from flashi2v.utils.random_utils import set_seed, get_seed_worker
+from flashi2v.utils.random_utils import set_seed
 from flashi2v.utils.filter import HighFrequencyExtractor
 from flashi2v.distributed.utils import (
     setup_distributed_env, 
@@ -359,7 +359,7 @@ def main(config):
         collate_fn=collator,
         num_workers=num_workers,
         pin_memory=data_config.get("pin_memory", False),
-        worker_init_fn=get_seed_worker(seed, num_workers=num_workers, device_specific=True),
+        # worker_init_fn=get_seed_worker(seed, num_workers=num_workers, device_specific=True),
     )
     encoder_cache_manager = EncoderCacheManager(tp_cp_group=cp_mesh.get_group() if use_context_parallel else None)
 
@@ -415,6 +415,11 @@ def main(config):
     tqdm_bar = tqdm(total=training_iteration, disable=(rank != 0), initial=current_iteration, desc="Training")
     gathered_avg_loss = 0.0
     dataloader_iter = iter(cyclic_iter(dataloader)) # when one epoch is finished, this func will call __iter__ in sampler to produce next iter with different seed
+
+    if checkpointer.last_training_iteration is not None:
+        log_on_main_process(logger, "Loading rng state...")
+        checkpointer.load_rng_state_dict()
+
     while current_iteration < training_iteration:
         if current_batch_nums % cp_size == 0:
             batch = next(dataloader_iter)

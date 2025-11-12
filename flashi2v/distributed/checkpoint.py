@@ -1,9 +1,12 @@
 import os
 import gc
 
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 from safetensors.torch import load_file as safe_load
+from accelerate.utils import load
 from torch.distributed.checkpoint.state_dict import (
     _init_optim_state,
     get_model_state_dict,
@@ -15,9 +18,11 @@ from torch.distributed.checkpoint.state_dict import (
 from torch.distributed.fsdp import FSDPModule
 from torch.distributed.tensor import distribute_tensor, DTensor
 
+from flashi2v.utils.utils import is_npu_available
 
 MODEL_CHECKPOINT = "model_state_dict.pt"
 OPTIM_CHECKPOINT = "optim_state_dict.pt"
+RNG_CHECKPOINT_DIR = "random_states"
 PARAMS = "params"
 PREFIX = "iter_"
 
@@ -233,20 +238,58 @@ class Checkpointer:
             }
         else:
             return {}
+        
+    def load_rng_state_dict(self):
+        last_rng_checkpoint_dir = (
+            f"{self.save_root_dir}/{PREFIX}{self.last_training_iteration:09d}/{RNG_CHECKPOINT_DIR}"
+        )
+        print(f'resume rng_state_dict from {last_rng_checkpoint_dir}')
+        rng_state_dict = load(f"{last_rng_checkpoint_dir}/rank_{torch.distributed.get_rank():06d}.pkl", map_location="cpu")
+        random.setstate(rng_state_dict["random_state"])
+        np.random.set_state(rng_state_dict["numpy_random_seed"])
+        torch.set_rng_state(rng_state_dict["torch_manual_seed"])
+        torch.cuda.set_rng_state_all(rng_state_dict["torch_cuda_manual_seed"])
+        if is_npu_available():
+            import torch_npu
+            torch_npu.npu.set_rng_state_all(rng_state_dict["torch_npu_manual_seed_all"])
+            torch_npu.npu.set_rng_state(rng_state_dict["torch_npu_manual_seed"])
+        del rng_state_dict
+        gc.collect()
+
+    def _get_full_rng_state_dict(self):
+        states = {}
+        states["random_state"] = random.getstate()
+        states["numpy_random_seed"] = np.random.get_state()
+        states["torch_manual_seed"] = torch.get_rng_state()
+        states["torch_cuda_manual_seed"] = torch.cuda.get_rng_state_all()
+        if is_npu_available():
+            import torch_npu
+            states["torch_npu_manual_seed_all"] = torch_npu.npu.get_rng_state_all()
+            states["torch_npu_manual_seed"] = torch_npu.npu.get_rng_state()
+        else:
+            states["torch_npu_manual_seed_all"] = None
+            states["torch_npu_manual_seed"] = None
+        return states
 
     def save(self, model: FSDPModule, optim: torch.optim.Optimizer, iteration: int):
         model_state_dict = self._get_full_model_state_dict(model)
         optim_state_dict = self._get_full_optimizer_state_dict(model, optim)
+        rng_state_dict = self._get_full_rng_state_dict()
+        new_training_iteration = f"{PREFIX}{iteration:09d}"
+        new_checkpoint_folder = f"{self.save_root_dir}/{new_training_iteration}"
+        rng_checkpoint_dir = f"{new_checkpoint_folder}/{RNG_CHECKPOINT_DIR}"
         if torch.distributed.get_rank() == 0:
-            new_training_iteration = f"{PREFIX}{iteration:09d}"
-            new_checkpoint_folder = f"{self.save_root_dir}/{new_training_iteration}"
+            os.makedirs(rng_checkpoint_dir, exist_ok=True)
             new_model_checkpoint = f"{new_checkpoint_folder}/{MODEL_CHECKPOINT}"
             new_optim_checkpoint = f"{new_checkpoint_folder}/{OPTIM_CHECKPOINT}"
             os.makedirs(new_checkpoint_folder, exist_ok=True)
             torch.save(model_state_dict, new_model_checkpoint)
             torch.save(optim_state_dict, new_optim_checkpoint)
+        torch.distributed.barrier()
+        torch.save(rng_state_dict, f"{rng_checkpoint_dir}/rank_{torch.distributed.get_rank():06d}.pkl")
         del model_state_dict
         del optim_state_dict
+        del rng_state_dict
 
     def save_ema_model(self, ema_model: FSDPModule, iteration: int):
         model_state_dict = self._get_full_model_state_dict(ema_model)
