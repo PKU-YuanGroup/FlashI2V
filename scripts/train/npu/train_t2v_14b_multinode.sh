@@ -1,16 +1,3 @@
-pkill -9 pt_main_thread
-pkill -9 python
-pkill -9 -f train.py
-ps aux | grep '[p]ython' | awk '{print $2}' | xargs -r kill -9
-tmux new -s clash -d "cd /work/share/projects/clash && ./clash -f 723.yaml"
-source /work/share/projects/clash/export.sh
-sleep 5s
-echo "start process..."
-source /usr/local/Ascend/ascend-toolkit/set_env.sh
-
-export WANDB_MODE="online"
-export WANDB_API_KEY="720d886d8c437c2142c88056a1eab8ef78d64a1f"
-wandb login --relogin $WANDB_API_KEY
 
 export TOKENIZERS_PARALLELISM=false
 
