@@ -5,12 +5,12 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 import copy
 
-from torch.utils.data import Dataset
 import numpy as np
 from transformers import AutoTokenizer
 from flashi2v.utils.constant import VIDEO, PROMPT_IDS, PROMPT_MASK
 from flashi2v.data.utils.utils import LMDBReader
 from flashi2v.data.utils.wan_utils import WanTextProcessor, WanVideoProcessor
+from flashi2v.data.datasets.base_dataset import BaseDataset
 
 T2VOutputData = {
     PROMPT_IDS: None,
@@ -18,7 +18,7 @@ T2VOutputData = {
     VIDEO: None,
 }
 
-class WanT2VDataset(Dataset):
+class WanT2VDataset(BaseDataset):
 
     def __init__(
         self,
@@ -115,7 +115,7 @@ class WanT2VDataset(Dataset):
         return prompt_input_ids, prompt_mask
         
 
-class T2VRandomDataset(Dataset):
+class T2VRandomDataset(BaseDataset):
     def __init__(
         self,
         text_tokenizer_path,

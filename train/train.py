@@ -14,6 +14,7 @@ from torch.distributed.tensor import DTensor
 from argparse import ArgumentParser
 
 from torch.utils.data import DataLoader
+from torchdata.stateful_dataloader import StatefulDataLoader
 
 from flashi2v.data import ultra_datasets, ultra_samplers, ultra_collators
 from flashi2v.data.utils.utils import cyclic_iter
@@ -286,27 +287,31 @@ def main(config):
     # sampler
     batch_size = data_config.get("batch_size", 1)
     dp_size = dp_group.size() 
-    consumed_samples = current_iteration * batch_size * gradient_accumulation_steps * dp_size
     sampler = ultra_samplers[data_config.get("sampler_name", "stateful_distributed")](
         dataset, 
         num_replicas=dist.get_world_size(), # we use encoder cache, so num_replicas = world_size
         rank=dist.get_rank(), # we use encoder cache, so rank in dp_group is same as global rank
         shuffle=data_config.get("shuffle", True),
-        consumed_samples=consumed_samples,
+        # consumed_samples=consumed_samples,
         drop_last=data_config.get("drop_last", True),
     )
     # dataloader
     num_workers = data_config.get("num_workers", 16)
     collator = ultra_collators[data_config.get("collator_name", "wan_t2v")](**data_config.get("collator_config", {}))
-    dataloader = DataLoader(
+    dataloader = StatefulDataLoader(
         dataset,
         batch_size=batch_size,
         sampler=sampler,
         collate_fn=collator,
         num_workers=num_workers,
         pin_memory=data_config.get("pin_memory", False),
-        # worker_init_fn=get_seed_worker(seed, num_workers=num_workers, device_specific=True),
+        generator=torch.Generator().manual_seed(seed + rank) # make sure all workers have different random patterns because we use encoder cache
     )
+
+    if checkpointer.last_training_iteration is not None:
+        log_on_main_process(logger, "Loading dataloader state...")
+        checkpointer.load_dataloader_state_dict(dataloader)
+
     encoder_cache_manager = EncoderCacheManager(tp_cp_group=cp_mesh.get_group() if use_context_parallel else None)
 
     trainable_params_before_sharding = trainable_params_after_sharding = 0
@@ -352,6 +357,7 @@ def main(config):
     Batch size per GPU: {batch_size}
     Gradient accumulation steps: {gradient_accumulation_steps}
     Effective batch size (dp_size x batch_size x gradient_accumulation_steps): {dp_size * batch_size * gradient_accumulation_steps}
+    Consumed samples (current_iteration * batch_size * gradient_accumulation_steps * dp_size): {current_iteration * batch_size * gradient_accumulation_steps * dp_size}
     Save model to {output_dir} every {save_interval} iterations
     Training ...
     {'=' * 20}{'=' * len('Start Training')}{'=' * 20}
@@ -361,11 +367,11 @@ def main(config):
     tqdm_bar = tqdm(total=training_iteration, disable=(rank != 0), initial=current_iteration, desc="Training")
     gathered_avg_loss = 0.0
     dataloader_iter = iter(cyclic_iter(dataloader)) # when one epoch is finished, this func will call __iter__ in sampler to produce next iter with different seed
-
+    
     if checkpointer.last_training_iteration is not None:
         log_on_main_process(logger, "Loading rng state...")
         checkpointer.load_rng_state_dict()
-
+    
     while current_iteration < training_iteration:
         if current_batch_nums % cp_size == 0:
             batch = next(dataloader_iter)
@@ -432,7 +438,7 @@ def main(config):
 
             if current_iteration % save_interval == 0 or current_iteration == training_iteration:
                 log_on_main_process(logger, f"Saving model checkpoint at iteration {current_iteration}...")
-                checkpointer.save(model, optimizer, current_iteration)
+                checkpointer.save(model, optimizer, dataloader, current_iteration)
                 ema_model.store(model)
                 ema_model.ema_copy_to_model(model)
                 checkpointer.save_ema_model(model, current_iteration)
